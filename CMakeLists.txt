@@ -1,0 +1,71 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(polution_viewer VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+
+find_package(Qt6 REQUIRED COMPONENTS Quick Network Test Graphs)
+qt_standard_project_setup(REQUIRES 6.8)
+
+set(SOURCES
+    src/main.cpp
+    src/apimanager.cpp
+    src/jsonrepository.cpp
+    src/requestcontext.cpp
+    src/appcontroller.cpp
+)
+
+set(HEADERS
+    src/apimanager.h
+    src/jsonrepository.h
+    src/requestcontext.h
+    src/appcontroller.h
+)
+
+qt_add_executable(apppolution_viewer
+    ${SOURCES}
+    ${HEADERS}
+)
+
+qt_add_qml_module(apppolution_viewer
+    URI polution_viewer
+    VERSION 1.0
+    QML_FILES src/MainView.qml
+    QML_FILES src/StationListView.qml
+    QML_FILES src/SensorListView.qml
+    QML_FILES src/SensorDataView.qml
+)
+
+target_include_directories(apppolution_viewer PRIVATE src)
+
+# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
+# If you are developing for iOS or macOS you should consider setting an
+# explicit, fixed bundle identifier manually though.
+set_target_properties(apppolution_viewer PROPERTIES
+#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.apppolution_viewer
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+target_link_libraries(apppolution_viewer
+    PRIVATE Qt6::Quick Qt6::Network Qt6::Graphs
+)
+
+include(GNUInstallDirs)
+install(TARGETS apppolution_viewer
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+# enable_testing()
+
+# add_executable(JsonRepositoryTests
+#     tests/test_jsonrepository.cpp
+#     src/jsonrepository.cpp
+#     src/apimanager.cpp
+#     src/requestcontext.cpp
+# )
