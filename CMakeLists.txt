@@ -35,7 +35,6 @@ qt_add_qml_module(apppolution_viewer
     QML_FILES src/StationListView.qml
     QML_FILES src/SensorListView.qml
     QML_FILES src/SensorDataView.qml
-    # QML_FILES src/ErrorView.qml
 )
 
 target_include_directories(apppolution_viewer PRIVATE src)

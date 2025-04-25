@@ -133,26 +133,31 @@ void AppController::handleDataReady(const RequestContext &context, const QJsonAr
             for (const QJsonValue &value : data) {
                 QJsonObject dataObj = value.toObject();
                 QVariantMap simplifiedDataEntry;
-                        QString timestampStr = dataObj.value("Data").toString();
+                QString timestampStr = dataObj.value("Data").toString();
                 QDateTime timestamp = QDateTime::fromString(timestampStr, "yyyy-MM-dd HH:mm:ss");
                 qint64 timestampUnix = timestamp.toSecsSinceEpoch();
-                        simplifiedDataEntry["timestamp"] = timestampUnix;
+
+                simplifiedDataEntry["timestamp"] = timestampUnix;
                 simplifiedDataEntry["value"] = dataObj.value("Wartość").toDouble();
-                        simpleData.append(simplifiedDataEntry);
+                simpleData.append(simplifiedDataEntry);
             }
-                    QVector<QVariantMap> sortedList;
+
+            QVector<QVariantMap> sortedList;
             sortedList.reserve(simpleData.size());
             for (auto it = simpleData.constBegin(); it != simpleData.constEnd(); ++it) {
                 sortedList.append(it->toMap());
             }
-                    std::sort(sortedList.begin(), sortedList.end(), [](const QVariantMap &a, const QVariantMap &b) {
+
+            std::sort(sortedList.begin(), sortedList.end(), [](const QVariantMap &a, const QVariantMap &b) {
                 return a["timestamp"].toLongLong() < b["timestamp"].toLongLong();
             });
-                    simpleData.clear();
+
+            simpleData.clear();
             for (const QVariantMap &item : sortedList) {
                 simpleData.append(item);
             }
-                    m_dataModel = simpleData;
+
+            m_dataModel = simpleData;
             emit dataModelChanged();
         }
     }

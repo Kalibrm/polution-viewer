@@ -23,14 +23,13 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
+
     QObject::connect(&app, &QCoreApplication::aboutToQuit, repoThread, &QThread::quit);
     QObject::connect(repoThread, &QThread::finished, repoThread, &QObject::deleteLater);
-
 
     engine.rootContext()->setContextProperty("appController", controller);
     repoThread->start();
     engine.loadFromModule("polution_viewer", "MainView");
-    // engine.load(QUrl(QStringLiteral("qrc:/MainView.qml")));
     if(engine.rootObjects().isEmpty())
         return -1;
 

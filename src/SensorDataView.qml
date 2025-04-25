@@ -8,6 +8,7 @@ Item {
 
     property var sensorData: appController.dataModel
     property string errorMessage: appController.errorMessage
+    property string sensorName: appController.sensorModel[0].sensorName
 
     function buildSeries() {
         lineSeries.clear();
@@ -59,19 +60,33 @@ Item {
         Rectangle {
             id: rectangle
             width: parent.width
-            height: title.implicitHeight + 15
+            height: textRect.height + 15
             color: "lightgray"
             border.color: "black"
             z: 100
 
-            Text {
-                id: title
-                text: "Dane pomiarowe"
-                anchors.verticalCenterOffset: 0
-                anchors.horizontalCenterOffset: 0
+            Rectangle {
+                id: textRect
                 anchors.centerIn: parent
-                font.pointSize: 20
+                height: title.implicitHeight + sensor.implicitHeight + 4
+                Text {
+                    id: title
+                    text: "Dane pomiarowe"
+                    anchors.verticalCenterOffset: -6
+                    anchors.horizontalCenterOffset: 0
+                    anchors.centerIn: parent
+                    font.pointSize: 15
+                }
+                Text {
+                    id: sensor
+                    text: sensorName
+                    anchors.verticalCenterOffset: 15
+                    anchors.horizontalCenterOffset: 0
+                    anchors.centerIn: parent
+                    font.pointSize: 12
+                }
             }
+
             Button {
                 x: 8
                 y: 16
