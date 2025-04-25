@@ -27,3 +27,5 @@ cmake ..
 cmake --build .
 ```
 
+---
+This project uses the Qt framework, which is licensed under the GNU General Public License v3. You can find the full Qt license [here](https://www.qt.io/terms-conditions/#gpl).
