@@ -34,7 +34,7 @@ ApplicationWindow {
         id: sensorList
         SensorListView {
             onBack: {
-                appController.goBackToStations()
+                appController.setErrorMessage("")
                 root.currentView = "stations"
             }
             onSensorSelected: (sensorId) => {
@@ -49,6 +49,7 @@ ApplicationWindow {
         SensorDataView {
             onBack: {
                 appController.goBackToSensors()
+                appController.setErrorMessage("")
                 root.currentView = "sensors"
             }
         }

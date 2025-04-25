@@ -3,6 +3,20 @@
 AppController::AppController(JsonRepository *repo, QObject *parent) : QObject{parent}, m_repo(repo)
 {
     connect(m_repo,&JsonRepository::dataReady, this, &AppController::handleDataReady);
+    connect(m_repo, &JsonRepository::errorOccured, this, &AppController::handleError);
+}
+
+QString AppController::errorMessage() const
+{
+    return m_errorMessage;
+}
+
+void AppController::setErrorMessage(const QString &msg)
+{
+    if(m_errorMessage != msg) {
+        m_errorMessage = msg;
+        emit errorMessageChanged();
+    }
 }
 
 int AppController::currentStationId() const {
@@ -68,6 +82,11 @@ void AppController::goBackToSensors() {
         loadSensorsForStation(m_currentStationId);
 }
 
+void AppController::handleError(const RequestContext &context, const QString &error)
+{
+    setErrorMessage(error);
+}
+
 void AppController::handleDataReady(const RequestContext &context, const QJsonArray &data) {
     QVariantList simpleData;
 
@@ -93,51 +112,48 @@ void AppController::handleDataReady(const RequestContext &context, const QJsonAr
         m_stationModel = simpleData;
         emit stationModelChanged();
     } else if(baseEndpoint == "station/sensors") {
-        for (const QJsonValue &value : data) {
-            QJsonObject sensorObj = value.toObject();
-            QVariantMap simplifiedSensor;
+        if(m_currentStationId == context.stationId) {
+            for (const QJsonValue &value : data) {
+                QJsonObject sensorObj = value.toObject();
+                QVariantMap simplifiedSensor;
 
-            simplifiedSensor["stationId"] = sensorObj.value("Identyfikator stacji").toInt();
-            simplifiedSensor["sensorId"] = sensorObj.value("Identyfikator stanowiska").toInt();
-            simplifiedSensor["sensorName"] = sensorObj.value("Wskaźnik").toString();
-            simplifiedSensor["sensorCode"] = sensorObj.value("Wskaźnik - kod").toString();
-            simplifiedSensor["sensorFormula"] = sensorObj.value("Wskaźnik - wzór").toString();
+                simplifiedSensor["stationId"] = sensorObj.value("Identyfikator stacji").toInt();
+                simplifiedSensor["sensorId"] = sensorObj.value("Identyfikator stanowiska").toInt();
+                simplifiedSensor["sensorName"] = sensorObj.value("Wskaźnik").toString();
+                simplifiedSensor["sensorCode"] = sensorObj.value("Wskaźnik - kod").toString();
+                simplifiedSensor["sensorFormula"] = sensorObj.value("Wskaźnik - wzór").toString();
 
-            simpleData.append(simplifiedSensor);   
+                simpleData.append(simplifiedSensor);
+            }
+            m_sensorModel = simpleData;
+            emit sensorModelChanged();
         }
-        m_sensorModel = simpleData;
-        emit sensorModelChanged();
     } else if(baseEndpoint == "data/getData"){
-        for (const QJsonValue &value : data) {
-            QJsonObject dataObj = value.toObject();
-            QVariantMap simplifiedDataEntry;
-
-            QString timestampStr = dataObj.value("Data").toString();
-            QDateTime timestamp = QDateTime::fromString(timestampStr, "yyyy-MM-dd HH:mm:ss");
-            qint64 timestampUnix = timestamp.toSecsSinceEpoch();
-
-            simplifiedDataEntry["timestamp"] = timestampUnix;
-            simplifiedDataEntry["value"] = dataObj.value("Wartość").toDouble();
-
-            simpleData.append(simplifiedDataEntry);
+        if(m_currentSensorId == context.sensorId) {
+            for (const QJsonValue &value : data) {
+                QJsonObject dataObj = value.toObject();
+                QVariantMap simplifiedDataEntry;
+                        QString timestampStr = dataObj.value("Data").toString();
+                QDateTime timestamp = QDateTime::fromString(timestampStr, "yyyy-MM-dd HH:mm:ss");
+                qint64 timestampUnix = timestamp.toSecsSinceEpoch();
+                        simplifiedDataEntry["timestamp"] = timestampUnix;
+                simplifiedDataEntry["value"] = dataObj.value("Wartość").toDouble();
+                        simpleData.append(simplifiedDataEntry);
+            }
+                    QVector<QVariantMap> sortedList;
+            sortedList.reserve(simpleData.size());
+            for (auto it = simpleData.constBegin(); it != simpleData.constEnd(); ++it) {
+                sortedList.append(it->toMap());
+            }
+                    std::sort(sortedList.begin(), sortedList.end(), [](const QVariantMap &a, const QVariantMap &b) {
+                return a["timestamp"].toLongLong() < b["timestamp"].toLongLong();
+            });
+                    simpleData.clear();
+            for (const QVariantMap &item : sortedList) {
+                simpleData.append(item);
+            }
+                    m_dataModel = simpleData;
+            emit dataModelChanged();
         }
-
-        QVector<QVariantMap> sortedList;
-        sortedList.reserve(simpleData.size());
-        for (auto it = simpleData.constBegin(); it != simpleData.constEnd(); ++it) {
-            sortedList.append(it->toMap());
-        }
-
-        std::sort(sortedList.begin(), sortedList.end(), [](const QVariantMap &a, const QVariantMap &b) {
-            return a["timestamp"].toLongLong() < b["timestamp"].toLongLong();
-        });
-
-        simpleData.clear();
-        for (const QVariantMap &item : sortedList) {
-            simpleData.append(item);
-        }
-
-        m_dataModel = simpleData;
-        emit dataModelChanged();
     }
 }

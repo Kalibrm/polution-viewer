@@ -44,6 +44,11 @@ class AppController : public QObject
      */
     Q_PROPERTY(int currentSensorId READ currentSensorId WRITE setCurrentSensorId NOTIFY currentSensorIdChanged FINAL)
 
+    /**
+     * @brief Wiadomość błędu
+     */
+    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorMessageChanged)
+
 public:
     /**
      * @brief Konstruktor kontrolera.
@@ -51,6 +56,9 @@ public:
      * @param parent Wskaźnik do obiektu rodzica.
      */
     explicit AppController(JsonRepository *repo, QObject *parent = nullptr);
+
+    QString errorMessage() const;
+    Q_INVOKABLE void setErrorMessage(const QString &msg);
 
     int currentStationId() const;
     void setCurrentStationId(int id);
@@ -95,6 +103,10 @@ signals:
     void dataModelChanged();
     void stationModelChanged();
     void sensorModelChanged();
+    void errorMessageChanged();
+
+public slots:
+    void handleError(const RequestContext &context, const QString &error);
 
 private slots:
     /**
@@ -110,6 +122,7 @@ private:
     QVariantList m_dataModel;       ///< Model danych pomiarowych.
     QVariantList m_stationModel;    ///< Model stacji.
     QVariantList m_sensorModel;     ///< Model czujników.
+    QString m_errorMessage;          ///< Tekst błędu.
 
     JsonRepository *m_repo;         ///< Wskaźnik do repozytorium danych.
 };

@@ -66,6 +66,8 @@ signals:
      */
     void dataReady(const RequestContext &context, const QJsonArray &data);
 
+    void errorOccured(const RequestContext &context, const QString &error);
+
 private:
     /**
      * @brief Zwraca ścieżkę pliku cache na podstawie kontekstu.

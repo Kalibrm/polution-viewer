@@ -7,6 +7,7 @@ Item {
     signal back()
 
     property var sensorData: appController.dataModel
+    property string errorMessage: appController.errorMessage
 
     function buildSeries() {
         lineSeries.clear();
@@ -51,6 +52,7 @@ Item {
     }
 
     Column {
+        id: column
         anchors.fill: parent
         spacing: 10
 
@@ -60,7 +62,7 @@ Item {
             height: title.implicitHeight + 15
             color: "lightgray"
             border.color: "black"
-            z: 1
+            z: 100
 
             Text {
                 id: title
@@ -78,8 +80,30 @@ Item {
             }
         }
 
+        Rectangle {
+            id: errorView
+            width: chart.width
+            height: chart.height
+            visible: errorMessage !== ""
+            color: "#ffe6e6"
+            border.color: "#cc0000"
+            anchors.horizontalCenter: parent.horizontalCenter
+            radius: 5
+            z: 99
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: errorMessage
+                color: "black"
+                wrapMode: Text.Wrap
+                font.bold: true
+                font.pointSize: 14
+            }
+        }
+
         GraphsView {
             id: chart
+            visible: errorMessage == ""
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width
             height: parent.height - 100

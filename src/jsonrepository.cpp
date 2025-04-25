@@ -13,6 +13,7 @@ JsonRepository::JsonRepository(const QString &cacheDir, QObject *parent)
         dir.mkdir(m_cacheDir);
 
     connect(&m_apiManager, &ApiManager::rawDataReady, this, &JsonRepository::processApiResponse);
+    connect(&m_apiManager, &ApiManager::errorOccured, this, &JsonRepository::errorOccured);
 }
 
 void JsonRepository::processApiResponse(const RequestContext &context, const QJsonArray &array, bool isPartial)
@@ -43,7 +44,7 @@ void JsonRepository::loadData(const RequestContext &context)
 {
     const QString filePath = getCacheFilePath(context);
 
-    qInfo() << filePath;
+    // qInfo() << filePath;
 
     try {
         if(!isNetworkAvailable()) {
@@ -63,9 +64,9 @@ void JsonRepository::loadData(const RequestContext &context)
         }
 
         m_apiManager.fetchPagedData(context);
-        qDebug() << "Fetching data";
 
     } catch(const std::exception &e) {
+        emit errorOccured(context, e.what());
         emit dataReady(context, QJsonArray());
     }
 }

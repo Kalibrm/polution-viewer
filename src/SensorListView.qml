@@ -5,6 +5,8 @@ Item {
     signal sensorSelected(int sensorId)
     signal back()
 
+    property string errorMessage: appController.errorMessage
+
     Column {
         anchors.fill: parent
         spacing: 10
@@ -15,7 +17,7 @@ Item {
             height: title.implicitHeight + 15
             color: "lightgray"
             border.color: "black"
-            z: 1
+            z: 100
 
                 Text {
                     id: title
@@ -33,10 +35,33 @@ Item {
                 }
             }
 
+        Rectangle {
+            id: errorView
+            width: scroll.width
+            height: scroll.height
+            visible: errorMessage !== ""
+            color: "#ffe6e6"
+            border.color: "#cc0000"
+            anchors.horizontalCenter: parent.horizontalCenter
+            radius: 5
+            z: 99
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: errorMessage
+                color: "black"
+                wrapMode: Text.Wrap
+                font.bold: true
+                font.pointSize: 14
+            }
+        }
+
         ScrollView {
+            id: scroll
             width: parent.width
             height: parent.height - rectangle.height - 15
-            clip: false
+            clip: true
+            visible: errorMessage == ""
 
             ListView {
                 model: appController.sensorModel

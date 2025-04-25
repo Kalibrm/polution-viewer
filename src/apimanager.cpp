@@ -115,13 +115,17 @@ void ApiManager::onReplyFinished(QNetworkReply *reply) {
                 }
             }
         }
+    } else if(httpStatus == 400) {
+        QString errorMsg = "Stacja pomiarowa jest typu manualnego i nie posiada danych aktualnych.";
+        emit errorOccured(context, errorMsg);
+        qWarning() << errorMsg;
+        state.pagesCompleted[page] = false;
     } else {
         QString errorMsg = QString("Błąd HTTP %1: %2").arg(httpStatus).arg(reply->errorString());
         emit errorOccured(context, errorMsg);
         qWarning() << errorMsg;
         state.pagesCompleted[page] = false;
-        if(httpStatus != 400)
-            queueRetry(id, page);
+        queueRetry(id, page);
     }
 
 
