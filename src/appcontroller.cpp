@@ -123,8 +123,9 @@ void AppController::handleDataReady(const RequestContext &context, const QJsonAr
         }
 
         QVector<QVariantMap> sortedList;
-        for (const QVariant &item : simpleData) {
-            sortedList.append(item.toMap());
+        sortedList.reserve(simpleData.size());
+        for (auto it = simpleData.constBegin(); it != simpleData.constEnd(); ++it) {
+            sortedList.append(it->toMap());
         }
 
         std::sort(sortedList.begin(), sortedList.end(), [](const QVariantMap &a, const QVariantMap &b) {

@@ -29,15 +29,15 @@ Item {
             }
         }
 
-        TextField {
-            id: searchField
-            width: parent.width - 20
-            height: 40
-            anchors.horizontalCenter: parent.horizontalCenter
-            placeholderText: "Wyszukaj stację..."
-            text: searchQuery
-            onTextChanged: searchQuery = searchField.text
-        }
+        // TextField {
+        //     id: searchField
+        //     width: parent.width - 20
+        //     height: 40
+        //     anchors.horizontalCenter: parent.horizontalCenter
+        //     placeholderText: "Wyszukaj stację..."
+        //     text: searchQuery
+        //     onTextChanged: searchQuery = searchField.text
+        // }
 
         ScrollView {
             width: parent.width
