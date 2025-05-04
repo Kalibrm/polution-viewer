@@ -6,8 +6,8 @@
 #include <QObject>
 #include <QJsonArray>
 #include <QVariantList>
-#include <JsonRepository.h>
-#include <RequestContext.h>
+#include "JsonRepository.h"
+#include "RequestContext.h"
 
 /**
  * @brief Główna klasa kontrolera logiki aplikacji.

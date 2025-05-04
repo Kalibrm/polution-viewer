@@ -10,7 +10,7 @@
 #include <QNetworkReply>
 #include <QJsonObject>
 #include <QTimer>
-#include <RequestContext.h>
+#include "RequestContext.h"
 
 /// Bazowy adres API GIOŚ
 static constexpr const char* BASE_URL = "https://api.gios.gov.pl/pjp-api/v1/rest/";

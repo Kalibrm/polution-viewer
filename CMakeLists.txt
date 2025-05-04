@@ -9,7 +9,6 @@ find_package(Qt6 REQUIRED COMPONENTS Quick Network Test Graphs)
 qt_standard_project_setup(REQUIRES 6.8)
 
 set(SOURCES
-    src/main.cpp
     src/apimanager.cpp
     src/jsonrepository.cpp
     src/requestcontext.cpp
@@ -23,9 +22,28 @@ set(HEADERS
     src/appcontroller.h
 )
 
-qt_add_executable(apppolution_viewer
+qt_add_library(polution_viewer_lib
+    SHARED
     ${SOURCES}
     ${HEADERS}
+)
+
+target_link_libraries(polution_viewer_lib
+    PRIVATE
+    Qt6::Core
+    Qt6::Network
+)
+
+qt_add_executable(apppolution_viewer
+    src/main.cpp
+)
+
+target_link_libraries(apppolution_viewer
+    PRIVATE polution_viewer_lib
+    Qt6::Core
+    Qt6::Quick
+    Qt6::Network
+    Qt6::Graphs
 )
 
 qt_add_qml_module(apppolution_viewer
@@ -50,10 +68,6 @@ set_target_properties(apppolution_viewer PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-target_link_libraries(apppolution_viewer
-    PRIVATE Qt6::Quick Qt6::Network Qt6::Graphs
-)
-
 include(GNUInstallDirs)
 install(TARGETS apppolution_viewer
     BUNDLE DESTINATION .
@@ -61,11 +75,29 @@ install(TARGETS apppolution_viewer
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# enable_testing()
+enable_testing()
 
-# add_executable(JsonRepositoryTests
-#     tests/test_jsonrepository.cpp
-#     src/jsonrepository.cpp
-#     src/apimanager.cpp
-#     src/requestcontext.cpp
-# )
+set(TEST_SOURCES
+    tests/testjsonrepository.cpp
+    tests/testrequestcontext.cpp
+)
+
+set(TEST_HEADERS
+    tests/testjsonrepository.h
+    tests/testrequestcontext.h
+)
+
+add_executable(polution_viewer_test
+    ${TEST_SOURCES}
+    ${TEST_HEADERS}
+    tests/main.cpp
+)
+
+target_link_libraries(polution_viewer_test
+    PRIVATE polution_viewer_lib
+    Qt6::Core
+    Qt6::Test
+    Qt6::Network
+)
+
+add_test(NAME AllTests COMMAND polution_viewer_test)

@@ -19,6 +19,8 @@
 class JsonRepository : public QObject
 {
     Q_OBJECT
+
+    friend class TestJsonRepository;
 public:
     /**
      * @brief Konstruktor repozytorium JSON.
